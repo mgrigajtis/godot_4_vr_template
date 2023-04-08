@@ -1,0 +1,107 @@
+[gd_scene load_steps=17 format=3 uid="uid://wht2l076qjun"]
+
+[ext_resource type="Script" path="res://Scripts/game.gd" id="1_stw2f"]
+[ext_resource type="PackedScene" uid="uid://bj1aas6kty3qx" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/left_physics_tac_glove_low.tscn" id="2_7a3yg"]
+[ext_resource type="PackedScene" uid="uid://bl2nuu3qhlb5k" path="res://addons/godot-xr-tools/functions/movement_direct.tscn" id="3_tvl6k"]
+[ext_resource type="PackedScene" uid="uid://c2uvwvdlsfuep" path="res://addons/godot-xr-tools/hands/scenes/lowpoly/right_physics_tac_glove_low.tscn" id="3_y8twp"]
+[ext_resource type="PackedScene" uid="uid://b4ysuy43poobf" path="res://addons/godot-xr-tools/functions/function_pickup.tscn" id="4_43wm7"]
+[ext_resource type="PackedScene" uid="uid://b6bk2pj8vbj28" path="res://addons/godot-xr-tools/functions/movement_turn.tscn" id="5_oroi1"]
+[ext_resource type="PackedScene" uid="uid://diyu06cw06syv" path="res://addons/godot-xr-tools/player/player_body.tscn" id="5_os7ha"]
+[ext_resource type="PackedScene" uid="uid://fiul51tsyoop" path="res://addons/godot-xr-tools/functions/function_teleport.tscn" id="6_g36cv"]
+
+[sub_resource type="Gradient" id="Gradient_5ccwi"]
+offsets = PackedFloat32Array(0.528226, 0.995968)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_lohry"]
+seed = 64184
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_v1aym"]
+in_3d_space = true
+seamless = true
+seamless_blend_skirt = 1.0
+color_ramp = SubResource("Gradient_5ccwi")
+noise = SubResource("FastNoiseLite_lohry")
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ciqmp"]
+sky_top_color = Color(0.0666667, 0.0941176, 0.54902, 1)
+sky_horizon_color = Color(0.384314, 0.513726, 0.670588, 1)
+sky_curve = 0.0279765
+sky_cover = SubResource("NoiseTexture2D_v1aym")
+ground_bottom_color = Color(0.0705882, 0.32549, 0.117647, 1)
+ground_horizon_color = Color(0.113725, 0.490196, 0.188235, 1)
+ground_curve = 0.0475683
+
+[sub_resource type="Sky" id="Sky_e1koo"]
+sky_material = SubResource("ProceduralSkyMaterial_ciqmp")
+
+[sub_resource type="Environment" id="Environment_lccq8"]
+background_mode = 2
+sky = SubResource("Sky_e1koo")
+ambient_light_source = 3
+ambient_light_color = Color(1, 1, 1, 1)
+reflected_light_source = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_lqnry"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rvgyp"]
+
+[node name="Game" type="Node3D"]
+script = ExtResource("1_stw2f")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+light_volumetric_fog_energy = 0.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lccq8")
+
+[node name="XROrigin3D" type="XROrigin3D" parent="."]
+current = true
+
+[node name="XRCamera3D" type="XRCamera3D" parent="XROrigin3D"]
+
+[node name="Left Controller" type="XRController3D" parent="XROrigin3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.381675, 0, 0)
+tracker = &"left_hand"
+pose = &"aim"
+
+[node name="FPSText" type="Label3D" parent="XROrigin3D/Left Controller"]
+transform = Transform3D(8.74228e-09, -7.64274e-16, -0.2, -1.74846e-08, -0.2, 0, -0.2, 1.74846e-08, -8.74228e-09, -0.0635575, -0.0498135, 0.1)
+text = "FPS: 
+"
+
+[node name="LeftPhysicsHand" parent="XROrigin3D/Left Controller" instance=ExtResource("2_7a3yg")]
+
+[node name="MovementDirect" parent="XROrigin3D/Left Controller" instance=ExtResource("3_tvl6k")]
+strafe = true
+
+[node name="FunctionPickup" parent="XROrigin3D/Left Controller" instance=ExtResource("4_43wm7")]
+
+[node name="Right Controller" type="XRController3D" parent="XROrigin3D"]
+tracker = &"right_hand"
+pose = &"aim"
+
+[node name="RightPhysicsHand" parent="XROrigin3D/Right Controller" instance=ExtResource("3_y8twp")]
+
+[node name="MovementTurn" parent="XROrigin3D/Right Controller" instance=ExtResource("5_oroi1")]
+step_turn_angle = 45.0
+
+[node name="FunctionTeleport" parent="XROrigin3D/Right Controller" instance=ExtResource("6_g36cv")]
+teleport_button_action = "ax_button"
+
+[node name="FunctionPickup" parent="XROrigin3D/Right Controller" instance=ExtResource("4_43wm7")]
+
+[node name="PlayerBody" parent="XROrigin3D" instance=ExtResource("5_os7ha")]
+
+[node name="Ambience" type="AudioStreamPlayer" parent="."]
+volume_db = -30.0
+pitch_scale = 0.3
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(100, 0, 0, 0, 1, 0, 0, 0, 100, 0, -1.52315, 0)
+mesh = SubResource("BoxMesh_lqnry")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("BoxShape3D_rvgyp")
