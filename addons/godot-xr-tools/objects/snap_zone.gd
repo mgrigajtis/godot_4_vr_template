@@ -26,6 +26,9 @@ enum SnapMode {
 ## Enable or disable snap-zone
 @export var enabled : bool = true
 
+## Optional audio stream to play when a object snaps to the zone
+@export var stash_sound : AudioStream
+
 ## Grab distance
 @export var grab_distance : float = 0.3: set = _set_grab_distance
 
@@ -71,13 +74,14 @@ func _ready():
 	_update_snap_mode()
 
 	# Perform the initial object check when next idle
-	call_deferred("_initial_object_check")
+	if not Engine.is_editor_hint():
+		call_deferred("_initial_object_check")
 
 
 # Called on each frame to update the pickup
 func _process(_delta):
-	# Skip if not enabled
-	if not enabled:
+	# Skip if in editor or not enabled
+	if Engine.is_editor_hint() or not enabled:
 		return
 
 	# Skip if we aren't doing range-checking
@@ -244,6 +248,12 @@ func pick_up_object(target: Node3D) -> void:
 
 	# Pick up our target. Note, target may do instant drop_and_free
 	picked_up_object = target
+	var player = get_node("AudioStreamPlayer3D")
+	if player.playing:
+		player.stop()
+	player.stream = stash_sound
+	player.play()
+
 	target.pick_up(self, null)
 
 	# If object picked up then emit signal

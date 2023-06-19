@@ -30,13 +30,6 @@ signal request_load_scene(p_scene_path)
 signal request_reset_scene
 
 
-## Environment
-#
-# Here we set the environment we need to set as our world environment
-# once our scene is loaded.
-
-@export var environment : Environment
-
 ## Interface
 
 func _ready() -> void:
@@ -126,3 +119,4 @@ func load_scene(p_scene_path : String) -> void:
 ## staging.
 func reset_scene() -> void:
 	emit_signal("request_reset_scene")
+

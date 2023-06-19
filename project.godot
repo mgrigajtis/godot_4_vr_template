@@ -19,10 +19,6 @@ config/icon="res://icon.svg"
 
 XRToolsUserSettings="*res://addons/godot-xr-tools/user_settings/user_settings.gd"
 
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/godot-xr-tools/plugin.cfg")
-
 [rendering]
 
 renderer/rendering_method="mobile"
